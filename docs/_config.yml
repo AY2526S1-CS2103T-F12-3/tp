@@ -1,4 +1,4 @@
-title: "SWEatless"
+title: "AB-3"
 theme: minima
 
 header_pages:
@@ -8,7 +8,7 @@ header_pages:
 
 markdown: kramdown
 
-repository: "AY2526S1-CS2103T-F12-3/tp"
+repository: "se-edu/addressbook-level3"
 github_icon: "images/github-icon.png"
 
 plugins:
