@@ -31,4 +31,4 @@ Currently, student and academic information are all over the place. We want to p
 ## Documentation
 
 For detailed documentation, including the **User Guide (UG)** and **Developer Guide (DG)**, see:  
-👉 [SWEatless Product Website](https://ay2526s1-cs2103-f13-3.github.io/tp/) (to be updated with SWEatless docs).
+👉 [SWEatless Product Website](https://ay2526s1-cs2103t-f12-3.github.io/tp/) (to be updated with SWEatless docs).
