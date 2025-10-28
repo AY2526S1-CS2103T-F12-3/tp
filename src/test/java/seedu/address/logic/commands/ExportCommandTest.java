@@ -21,17 +21,13 @@ import seedu.address.model.UserPrefs;
 class ExportCommandTest {
 
     @TempDir
-    Path tempDir; // JUnit provides a temporary directory
+    public Path tempDir; // JUnit provides a temporary directory
 
-    private Path sourceFile;
     private Model model;
 
     @BeforeEach
     void setUp() throws IOException {
         // Create a temporary source file to simulate the existing address book
-        sourceFile = tempDir.resolve("addressbook.json");
-        Files.writeString(sourceFile, "{\"persons\":[]}");
-
         model = new ModelManager(getTypicalAddressBook(), new UserPrefs());
     }
 
