@@ -26,7 +26,8 @@ class ExportCommandTest {
 
         // Check that the file was copied
         assertCommandSuccess(new ExportCommand(tempDir.toString()), model,
-                String.format(ExportCommand.MESSAGE_SUCCESS, tempDir.toString()) + "\\" + ExportCommand.DEFAULT_FILE, model);
+                String.format(ExportCommand.MESSAGE_SUCCESS, tempDir.toString())
+                        + "\\" + ExportCommand.DEFAULT_FILE, model);
         //assertTrue(Files.exists(exportPath));
     }
 
