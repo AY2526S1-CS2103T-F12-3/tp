@@ -27,6 +27,7 @@ public class ExportCommand extends Command {
 
     public static final String MESSAGE_SUCCESS = "Address book successfully exported to: %1$s";
     public static final String MESSAGE_FAILURE = "Failed to export data: %1$s";
+    public static final String DEFAULT_FILE = "exported_addressbook.json";
 
     private final String filePath;
 
@@ -53,7 +54,7 @@ public class ExportCommand extends Command {
                 Files.createDirectories(exportPath.getParent());
             }
             if (Files.exists(exportPath) && Files.isDirectory(exportPath)) {
-                exportPath = exportPath.resolve("exported_addressbook.json");
+                exportPath = exportPath.resolve(DEFAULT_FILE);
             } else if (!exportPath.toString().toLowerCase().endsWith(".json")) {
                 // If it's a file but missing .json, append extension
                 exportPath = Paths.get(exportPath.toString() + ".json");
