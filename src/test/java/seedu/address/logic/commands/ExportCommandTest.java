@@ -1,8 +1,8 @@
 package seedu.address.logic.commands;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,13 +22,22 @@ class ExportCommandTest {
     private Model model = new ModelManager();
 
     @Test
-    void execute_validFilePath_success() throws Exception {
+    void execute_directoryPath_appendsDefaultFileName_success() throws Exception {
+        Path exportDir = tempDir.resolve("myfolder");
+        Files.createDirectories(exportDir);
 
-        // Check that the file was copied
-        assertCommandSuccess(new ExportCommand(tempDir.toString()), model,
-                String.format(ExportCommand.MESSAGE_SUCCESS, tempDir.toString())
-                        + "\\" + ExportCommand.DEFAULT_FILE, model);
-        //assertTrue(Files.exists(exportPath));
+        ExportCommand command = new ExportCommand(exportDir.toString());
+        CommandResult result = command.execute(model);
+
+        // The command will append the default file name internally
+        Path expectedFile = exportDir.resolve(ExportCommand.DEFAULT_FILE);
+
+        // Check that the file exists
+        assertTrue(Files.exists(expectedFile));
+
+        // Compare feedback to user with the actual file path returned by the command
+        assertEquals(String.format(ExportCommand.MESSAGE_SUCCESS, expectedFile.toString()),
+                result.getFeedbackToUser());
     }
 
     @Test
