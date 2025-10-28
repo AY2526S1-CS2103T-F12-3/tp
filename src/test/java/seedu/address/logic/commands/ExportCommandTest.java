@@ -2,6 +2,8 @@ package seedu.address.logic.commands;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
 import java.io.IOException;
@@ -37,12 +39,11 @@ class ExportCommandTest {
     @Test
     void execute_validFilePath_success() throws Exception {
         Path exportPath = tempDir.resolve("export.json");
-        ExportCommand command = new ExportCommand(exportPath.toString());
-        CommandResult result = command.execute(model);
 
         // Check that the file was copied
-        assertTrue(Files.exists(exportPath));
-        //assertEquals(String.format(ExportCommand.MESSAGE_SUCCESS, exportPath), result.getFeedbackToUser());
+        assertCommandSuccess(new ExportCommand(exportPath.toString()), model,
+                String.format(ExportCommand.MESSAGE_SUCCESS, exportPath), model);
+        //assertTrue(Files.exists(exportPath));
     }
 
     @Test
