@@ -31,9 +31,11 @@ class ExportCommandTest {
         // Initialize model with typical address book
         model = new ModelManager(getTypicalAddressBook(), new UserPrefs());
 
-        // Create a temporary source file to simulate the existing address book
-        sourceFile = tempDir.resolve("addressbook.json");
-        Files.writeString(sourceFile, "{\"persons\":[]}");
+        // Make sure the model's default address book file exists
+        Path defaultFile = model.getAddressBookFilePath();
+        Files.createDirectories(defaultFile.getParent()); // ensure parent directories
+        Files.writeString(defaultFile, "{\"persons\":[]}");
+
     }
     @Test
     void execute_directoryPath_success() throws Exception {
