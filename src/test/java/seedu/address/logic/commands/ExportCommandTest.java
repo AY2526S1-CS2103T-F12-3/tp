@@ -22,7 +22,7 @@ class ExportCommandTest {
     private Model model = new ModelManager();
 
     @Test
-    void execute_directoryPath_appendsDefaultFileName_success() throws Exception {
+    void execute_directoryPath_success() throws Exception {
         Path exportDir = tempDir.resolve("myfolder");
         Files.createDirectories(exportDir);
 
