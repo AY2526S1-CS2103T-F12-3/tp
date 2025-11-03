@@ -4,6 +4,8 @@ import static java.util.Objects.requireNonNull;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TEAM;
 
+import java.util.List;
+
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.AddStudentToTeamCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
@@ -23,12 +25,12 @@ public class AddStudentToTeamCommandParser implements Parser<AddStudentToTeamCom
         ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args, PREFIX_TEAM);
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_TEAM);
 
-        Index studentIndex;
+        List<Index> studentIndices;
         String teamName;
 
         // Extract person index from preamble (everything before the team prefix)
         try {
-            studentIndex = ParserUtil.parseIndex(argMultimap.getPreamble());
+            studentIndices = ParserUtil.parseIndices(argMultimap.getPreamble());
         } catch (ParseException pe) {
             throw new ParseException(String.format(AddStudentToTeamCommand.MESSAGE_USAGE), pe);
         }
@@ -41,6 +43,6 @@ public class AddStudentToTeamCommandParser implements Parser<AddStudentToTeamCom
 
         teamName = ParserUtil.parseTeamName(argMultimap.getValue(PREFIX_TEAM).get());
 
-        return new AddStudentToTeamCommand(studentIndex, teamName);
+        return new AddStudentToTeamCommand(studentIndices, teamName);
     }
 }
