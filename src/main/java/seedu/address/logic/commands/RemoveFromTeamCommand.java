@@ -3,6 +3,8 @@ package seedu.address.logic.commands;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS;
 
+import java.util.List;
+
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
@@ -25,54 +27,62 @@ public class RemoveFromTeamCommand extends Command {
 
     public static final String MESSAGE_SUCCESS = "Person %s removed from team %s";
     public static final String MESSAGE_PERSON_NOT_IN_TEAM = "Person %s is not in team %s";
-    public static final String MESSAGE_CANNOT_REMOVE_FROM_NONE = "Person is currently not in a team";
+    public static final String MESSAGE_CANNOT_REMOVE_FROM_NONE = "Person %s is currently not in a team";
 
-    private final Index personIndex;
+    private final List<Index> studentIndices;
 
     /**
      * Creates a RemoveFromTeamCommand to remove the specified person from the team.
      */
-    public RemoveFromTeamCommand(Index personIndex) {
-        requireNonNull(personIndex);
-        this.personIndex = personIndex;
-    }
-
-    public Index getPersonIndex() {
-        return personIndex;
+    public RemoveFromTeamCommand(List<Index> studentIndices) {
+        requireNonNull(studentIndices);
+        this.studentIndices = studentIndices;
     }
 
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
 
-        Person targetPerson = TeamCommandUtil.getTargetPerson(model, personIndex);
-        String teamName = targetPerson.getTeamName();
+        StringBuilder successMessage = new StringBuilder();
+        StringBuilder failureBuilder = new StringBuilder();
+        boolean isInvalid = false;
 
-        // Disallow removing from the NONE sentinel team
-        if (Team.isNoneTeamName(teamName)) {
-            throw new CommandException(MESSAGE_CANNOT_REMOVE_FROM_NONE);
+        for (Index studentIndex: studentIndices) {
+            Person targetPerson = TeamCommandUtil.getTargetPerson(model, studentIndex);
+            String teamName = targetPerson.getTeamName();
+
+            if (Team.isNoneTeamName(teamName)) {
+                isInvalid = true;
+                failureBuilder.append(String.format(MESSAGE_CANNOT_REMOVE_FROM_NONE, targetPerson.getEmail()));
+            }
         }
-        Team targetTeam = TeamCommandUtil.validateTeamExists(model, teamName);
 
-        // Check if person is in the team
-        TeamCommandUtil.validatePersonMembership(targetTeam, targetPerson, MESSAGE_PERSON_NOT_IN_TEAM);
+        if (isInvalid) {
+            throw new CommandException(failureBuilder.toString());
+        }
 
-        // Remove person from team
-        model.removePersonFromTeam(targetPerson, targetTeam);
+        for (Index studentIndex: studentIndices) {
+            Person targetPerson = TeamCommandUtil.getTargetPerson(model, studentIndex);
+            String teamName = targetPerson.getTeamName();
+            Team targetTeam = TeamCommandUtil.validateTeamExists(model, teamName);
+            TeamCommandUtil.validatePersonMembership(targetTeam, targetPerson, MESSAGE_PERSON_NOT_IN_TEAM);
 
-        // Update the person's team to NONE by finding them by email
-        Person updatedPerson = new Person(
-                targetPerson.getName(),
-                targetPerson.getPhone(),
-                targetPerson.getEmail(),
-                targetPerson.getGithub(),
-                Team.NONE);
+            model.removePersonFromTeam(targetPerson, targetTeam);
 
-        model.setPerson(targetPerson, updatedPerson);
-        model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
+            Person updatedPerson = new Person(
+                    targetPerson.getName(),
+                    targetPerson.getPhone(),
+                    targetPerson.getEmail(),
+                    targetPerson.getGithub(),
+                    Team.NONE);
 
-        return new CommandResult(String.format(MESSAGE_SUCCESS,
-                Messages.format(updatedPerson), teamName));
+            model.setPerson(targetPerson, updatedPerson);
+            model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
+            successMessage.append(String.format(MESSAGE_SUCCESS,
+                    Messages.format(updatedPerson), teamName) + "\n");
+        }
+
+        return new CommandResult(successMessage.toString());
     }
 
     @Override
@@ -87,13 +97,13 @@ public class RemoveFromTeamCommand extends Command {
         }
 
         RemoveFromTeamCommand otherRemoveFromTeamCommand = (RemoveFromTeamCommand) other;
-        return personIndex.equals(otherRemoveFromTeamCommand.personIndex);
+        return studentIndices.equals(otherRemoveFromTeamCommand.studentIndices);
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .add("personIndex", personIndex)
+                .add("personIndex", studentIndices)
                 .toString();
     }
 }

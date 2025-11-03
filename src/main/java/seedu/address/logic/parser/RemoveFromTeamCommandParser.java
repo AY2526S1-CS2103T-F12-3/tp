@@ -2,6 +2,8 @@ package seedu.address.logic.parser;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.List;
+
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.RemoveFromTeamCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
@@ -20,17 +22,17 @@ public class RemoveFromTeamCommandParser implements Parser<RemoveFromTeamCommand
         requireNonNull(args);
         ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args);
 
-        Index personIndex;
+        List<Index> studentIndices;
 
         // Extract person index from preamble (everything before the team prefix)
         try {
-            personIndex = ParserUtil.parseIndex(argMultimap.getPreamble());
+            studentIndices = ParserUtil.parseIndices(argMultimap.getPreamble());
         } catch (ParseException pe) {
             throw new ParseException(String.format(RemoveFromTeamCommand.MESSAGE_USAGE), pe);
         }
 
 
 
-        return new RemoveFromTeamCommand(personIndex);
+        return new RemoveFromTeamCommand(studentIndices);
     }
 }
