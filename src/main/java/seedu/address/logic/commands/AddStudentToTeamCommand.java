@@ -31,7 +31,7 @@ public class AddStudentToTeamCommand extends Command {
     public static final String MESSAGE_PERSON_ALREADY_IN_TEAM = "Person %s is already in team %s";
     public static final String MESSAGE_PERSON_IN_ANOTHER_TEAM = "Person %s is already in team %s. "
             + "Remove them from their current team before adding to a new team";
-    public static final String MESSAGE_TEAM_FULL = "Team %s is at maximum capacity (5 members)";
+    public static final String MESSAGE_TEAM_FULL = "Failed to add %s. Team %s is at maximum capacity (5 members)";
 
     private final List<Index> studentIndices;
     private final String teamName;
@@ -64,24 +64,36 @@ public class AddStudentToTeamCommand extends Command {
         if (Team.isNoneTeamName(teamName) || targetTeam.equals(Team.NONE)) {
             throw new CommandException(Team.MESSAGE_CONSTRAINTS);
         }
+
         StringBuilder successMessage = new StringBuilder();
+        StringBuilder failureBuilder = new StringBuilder();
+        boolean isInvalid = false;
+
         for (Index studentIndex: studentIndices) {
             Person targetPerson = TeamCommandUtil.getTargetPerson(model, studentIndex);
 
             // Check if person is already in any team
             Team existingTeam = model.getTeamContainingPerson(targetPerson);
             if (existingTeam != null) {
+                isInvalid = true;
                 if (existingTeam.equals(targetTeam)) {
                     // Person is already in the same team
-                    throw new CommandException(String.format(MESSAGE_PERSON_ALREADY_IN_TEAM,
+                    failureBuilder.append(String.format(MESSAGE_PERSON_ALREADY_IN_TEAM,
                         Messages.format(targetPerson), teamName));
                 } else {
                     // Person is in a different team
-                    throw new CommandException(String.format(MESSAGE_PERSON_IN_ANOTHER_TEAM,
+                    failureBuilder.append(String.format(MESSAGE_PERSON_IN_ANOTHER_TEAM,
                         Messages.format(targetPerson), existingTeam.getName()));
                 }
             }
+        }
 
+        if (isInvalid) {
+            throw new CommandException(failureBuilder.toString());
+        }
+
+        for (Index studentIndex: studentIndices) {
+            Person targetPerson = TeamCommandUtil.getTargetPerson(model, studentIndex);
             try {
                 Person updatedPerson = new Person(targetPerson.getName(),
                         targetPerson.getPhone(),
@@ -96,7 +108,8 @@ public class AddStudentToTeamCommand extends Command {
                         + "\n");
 
             } catch (TeamMaxCapacityException e) {
-                throw new CommandException(String.format(MESSAGE_TEAM_FULL, teamName));
+                successMessage.append(String.format(MESSAGE_TEAM_FULL, targetPerson.getName(), teamName) + "\n");
+
             }
         }
         return new CommandResult(successMessage.toString());
